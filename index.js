@@ -91,5 +91,18 @@ const sendTestEmail = async () => {
     }
 };
 
+// Handle shutdown signals to ensure clean exits
+process.on("SIGTERM", () => {
+    console.log("SIGTERM signal received: closing app...");
+    process.exit(0);
+});
+
+process.on("SIGINT", () => {
+    console.log("SIGINT signal received: closing app...");
+    process.exit(0);
+});
+
 // Only send a test email if the SEND_TEST_EMAIL variable is true
-sendTestEmail();
+if (process.env.SEND_TEST_EMAIL === "true") {
+    sendTestEmail();
+}
