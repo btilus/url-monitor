@@ -1,6 +1,7 @@
 const axios = require("axios");
 const cron = require("node-cron");
 const cheerio = require("cheerio");
+const nodemailer = require("nodemailer");
 require("dotenv").config();
 
 const URL_TO_MONITOR = "https://murphybusiness.com/siouxfalls/businesses-for-sale/";
@@ -14,8 +15,8 @@ const checkForUpdates = async () => {
         // Load the HTML into cheerio
         const $ = cheerio.load(response.data);
 
-        // Extract meaningful content by targeting specific elements (update selector as needed)
-        const content = $("#list_div").text().trim(); // Replace "#main-content" with the correct selector
+        // Extract meaningful content by targeting specific elements
+        const content = $("#list_div").text().trim(); // Update selector as needed
 
         // Create a hash of the extracted content
         const currentHash = Buffer.from(content).toString("base64");
@@ -23,9 +24,31 @@ const checkForUpdates = async () => {
         // Compare hashes to detect changes
         if (lastContentHash && currentHash !== lastContentHash) {
             console.log(`Update detected at ${URL_TO_MONITOR}`);
+
+            // Email notification logic
+            const transporter = nodemailer.createTransport({
+                host: process.env.SMTP_HOST,
+                port: process.env.SMTP_PORT,
+                secure: false, // Set to true if using port 465
+                auth: {
+                    user: process.env.SMTP_USER,
+                    pass: process.env.SMTP_PASS,
+                },
+            });
+
+            const mailOptions = {
+                from: `"URL Monitor" <${process.env.SMTP_USER}>`,
+                to: process.env.TO_EMAIL,
+                subject: "Update Detected!",
+                text: `An update was detected on ${URL_TO_MONITOR}. Check it out!`,
+            };
+
+            await transporter.sendMail(mailOptions);
+            console.log("Email notification sent!");
         } else {
-            console.log(`No changes detected.`);
+            console.log("No changes detected.");
         }
+
         lastContentHash = currentHash; // Update the last known hash
     } catch (error) {
         console.error(`Error fetching URL: ${error.message}`);
