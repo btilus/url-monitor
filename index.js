@@ -60,18 +60,21 @@ cron.schedule("* * * * *", checkForUpdates);
 console.log(`Monitoring ${URL_TO_MONITOR}...`);
 
 const sendTestEmail = async () => {
+    console.log("sendTestEmail() function called"); // Add log here
     try {
         const nodemailer = require("nodemailer");
 
         const transporter = nodemailer.createTransport({
             host: process.env.SMTP_HOST,
             port: process.env.SMTP_PORT,
-            secure: false, // Use true for 465, false for other ports
+            secure: false, // Use true for port 465
             auth: {
                 user: process.env.SMTP_USER,
                 pass: process.env.SMTP_PASS,
             },
         });
+
+        console.log("SMTP transporter created"); // Add log here
 
         const mailOptions = {
             from: `"URL Monitor Test" <${process.env.SMTP_USER}>`,
@@ -80,12 +83,13 @@ const sendTestEmail = async () => {
             text: "This is a test email to verify the email credentials.",
         };
 
+        console.log("Sending email..."); // Add log here
         await transporter.sendMail(mailOptions);
-        console.log("Test email sent successfully!");
+        console.log("Test email sent successfully!"); // Add log here
     } catch (error) {
-        console.error(`Error sending test email: ${error.message}`);
+        console.error(`Error sending test email: ${error.message}`); // Log errors
     }
 };
 
-// Uncomment this line to send a test email when the script starts
+// Only send a test email if the SEND_TEST_EMAIL variable is true
 sendTestEmail();
