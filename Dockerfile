@@ -2,7 +2,7 @@
 
 # Adjust NODE_VERSION as desired
 ARG NODE_VERSION=23.2.0
-FROM node:${NODE_VERSION}-slim as base
+FROM node:18-slim
 
 LABEL fly_launch_runtime="Node.js"
 
