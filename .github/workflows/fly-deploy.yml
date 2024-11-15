@@ -27,3 +27,9 @@ jobs:
           fly machines list --app url-monitor | awk '/app/ {print $1}' | xargs -I {} fly machine start {}
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+
+   - name: Start machines after deploy
+     run: |
+       fly machines list --app url-monitor | awk '/app/ {print $1}' | xargs -I {} fly machine start {}
+     env:
+       FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
